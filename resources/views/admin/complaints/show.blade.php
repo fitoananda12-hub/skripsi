@@ -296,6 +296,27 @@
                         </div>
                     </div>
                     <div class="flex items-center">
+                        <i class="fas fa-id-card text-gray-400 w-5"></i>
+                        <div class="ml-3">
+                            <p class="text-xs text-gray-500">NIK Karyawan</p>
+                            <p class="text-sm text-gray-800">{{ $complaint->user->nik }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-briefcase text-gray-400 w-5"></i>
+                        <div class="ml-3">
+                            <p class="text-xs text-gray-500">Jabatan</p>
+                            <p class="text-sm text-gray-800">{{ $complaint->user->jabatan }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <i class="fas fa-building text-gray-400 w-5"></i>
+                        <div class="ml-3">
+                            <p class="text-xs text-gray-500">Departemen</p>
+                            <p class="text-sm text-gray-800">{{ $complaint->user->departemen }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
                         <i class="fas fa-envelope text-gray-400 w-5"></i>
                         <div class="ml-3">
                             <p class="text-xs text-gray-500">Email</p>

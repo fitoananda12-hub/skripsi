@@ -15,6 +15,20 @@
             </div>
             <h3 class="text-xl font-bold text-gray-800">{{ $user->name }}</h3>
             <p class="text-gray-500 text-sm">{{ $user->email }}</p>
+            <div class="mt-4 pt-4 border-t border-gray-200 space-y-2">
+                <div class="text-left">
+                    <p class="text-xs text-gray-500">NIK</p>
+                    <p class="text-sm font-semibold text-gray-800">{{ $user->nik }}</p>
+                </div>
+                <div class="text-left">
+                    <p class="text-xs text-gray-500">Jabatan</p>
+                    <p class="text-sm font-semibold text-gray-800">{{ $user->jabatan }}</p>
+                </div>
+                <div class="text-left">
+                    <p class="text-xs text-gray-500">Departemen</p>
+                    <p class="text-sm font-semibold text-gray-800">{{ $user->departemen }}</p>
+                </div>
+            </div>
             <div class="mt-4 pt-4 border-t border-gray-200">
                 <p class="text-sm text-gray-600 mb-1">Member sejak</p>
                 <p class="text-sm font-semibold text-gray-800">{{ $user->created_at->format('d M Y') }}</p>
@@ -51,6 +65,36 @@
                         <input type="email" name="email" value="{{ old('email', $user->email) }}" 
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent @error('email') border-red-500 @enderror" required>
                         @error('email')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- NIK -->
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-semibold mb-2">NIK Karyawan</label>
+                        <input type="text" name="nik" value="{{ old('nik', $user->nik) }}" 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent @error('nik') border-red-500 @enderror" required>
+                        @error('nik')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Jabatan -->
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-semibold mb-2">Jabatan</label>
+                        <input type="text" name="jabatan" value="{{ old('jabatan', $user->jabatan) }}" 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent @error('jabatan') border-red-500 @enderror" required>
+                        @error('jabatan')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Departemen -->
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-semibold mb-2">Departemen</label>
+                        <input type="text" name="departemen" value="{{ old('departemen', $user->departemen) }}" 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent @error('departemen') border-red-500 @enderror" required>
+                        @error('departemen')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
@@ -92,6 +136,9 @@
                     <!-- Hidden fields untuk profil -->
                     <input type="hidden" name="name" value="{{ $user->name }}">
                     <input type="hidden" name="email" value="{{ $user->email }}">
+                    <input type="hidden" name="nik" value="{{ $user->nik }}">
+                    <input type="hidden" name="jabatan" value="{{ $user->jabatan }}">
+                    <input type="hidden" name="departemen" value="{{ $user->departemen }}">
                     <input type="hidden" name="phone" value="{{ $user->phone }}">
                     <input type="hidden" name="address" value="{{ $user->address }}">
 

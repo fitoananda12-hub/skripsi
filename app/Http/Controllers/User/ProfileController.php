@@ -22,6 +22,9 @@ class ProfileController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:users,email,' . $user->id],
+            'nik' => ['required', 'string', 'max:50', 'unique:users,nik,' . $user->id],
+            'jabatan' => ['required', 'string', 'max:100'],
+            'departemen' => ['required', 'string', 'max:100'],
             'phone' => ['required', 'string', 'max:20'],
             'address' => ['required', 'string'],
             'current_password' => ['nullable', 'required_with:new_password'],
@@ -30,6 +33,10 @@ class ProfileController extends Controller
             'name.required' => 'Nama harus diisi',
             'email.required' => 'Email harus diisi',
             'email.unique' => 'Email sudah digunakan',
+            'nik.required' => 'NIK Karyawan harus diisi',
+            'nik.unique' => 'NIK sudah digunakan',
+            'jabatan.required' => 'Jabatan harus diisi',
+            'departemen.required' => 'Departemen harus diisi',
             'phone.required' => 'Nomor telepon harus diisi',
             'address.required' => 'Alamat harus diisi',
             'current_password.required_with' => 'Password lama harus diisi jika ingin mengganti password',
@@ -40,6 +47,9 @@ class ProfileController extends Controller
         // Update basic info
         $user->name = $validated['name'];
         $user->email = $validated['email'];
+        $user->nik = $validated['nik'];
+        $user->jabatan = $validated['jabatan'];
+        $user->departemen = $validated['departemen'];
         $user->phone = $validated['phone'];
         $user->address = $validated['address'];
 

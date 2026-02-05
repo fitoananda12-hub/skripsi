@@ -44,6 +44,39 @@
                         @enderror
                     </div>
 
+                    <!-- NIK -->
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">NIK Karyawan <span class="text-red-500">*</span></label>
+                        <input type="text" name="nik" value="{{ old('nik') }}" 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent @error('nik') border-red-500 @enderror"
+                            placeholder="Contoh: NIK12345" required>
+                        @error('nik')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Jabatan -->
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Jabatan <span class="text-red-500">*</span></label>
+                        <input type="text" name="jabatan" value="{{ old('jabatan') }}" 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent @error('jabatan') border-red-500 @enderror"
+                            placeholder="Contoh: Staff Marketing" required>
+                        @error('jabatan')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Departemen -->
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Departemen <span class="text-red-500">*</span></label>
+                        <input type="text" name="departemen" value="{{ old('departemen') }}" 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent @error('departemen') border-red-500 @enderror"
+                            placeholder="Contoh: Marketing" required>
+                        @error('departemen')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     <!-- Phone -->
                     <div>
                         <label class="block text-gray-700 font-medium mb-2">Nomor Telepon <span class="text-red-500">*</span></label>
