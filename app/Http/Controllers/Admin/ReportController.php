@@ -12,46 +12,55 @@ class ReportController extends Controller
 {
     public function index(Request $request)
     {
-        $dateFrom = $request->input('date_from', now()->startOfMonth()->format('Y-m-d'));
-        $dateTo = $request->input('date_to', now()->format('Y-m-d'));
+        $dateFrom = $request->input('date_from');
+        $dateTo = $request->input('date_to');
+
+        // Base query for complaints in the selected period
+        $complaintQuery = Complaint::query();
+        if ($dateFrom) {
+            $complaintQuery->where('created_at', '>=', $dateFrom . ' 00:00:00');
+        }
+        if ($dateTo) {
+            $complaintQuery->where('created_at', '<=', $dateTo . ' 23:59:59');
+        }
 
         // Total complaints in period
-        $totalComplaints = Complaint::whereBetween('created_at', [$dateFrom, $dateTo])->count();
+        $totalComplaints = (clone $complaintQuery)->count();
 
         // Complaints by status
-        $complaintsByStatus = Complaint::select('status', DB::raw('count(*) as total'))
-            ->whereBetween('created_at', [$dateFrom, $dateTo])
+        $complaintsByStatus = (clone $complaintQuery)
+            ->select('status', DB::raw('count(*) as total'))
             ->groupBy('status')
             ->get();
 
         // Complaints by priority
-        $complaintsByPriority = Complaint::select('priority', DB::raw('count(*) as total'))
-            ->whereBetween('created_at', [$dateFrom, $dateTo])
+        $complaintsByPriority = (clone $complaintQuery)
+            ->select('priority', DB::raw('count(*) as total'))
             ->groupBy('priority')
             ->get();
 
         // Top products with complaints
-        $topProducts = Complaint::select('product_name', DB::raw('count(*) as total'))
-            ->whereBetween('created_at', [$dateFrom, $dateTo])
+        $topProducts = (clone $complaintQuery)
+            ->select('product_name', DB::raw('count(*) as total'))
             ->groupBy('product_name')
             ->orderBy('total', 'desc')
             ->limit(10)
             ->get();
 
         // Top problem types
-        $topProblems = Complaint::select('problem_type', DB::raw('count(*) as total'))
-            ->whereBetween('created_at', [$dateFrom, $dateTo])
+        $topProblems = (clone $complaintQuery)
+            ->select('problem_type', DB::raw('count(*) as total'))
             ->groupBy('problem_type')
             ->orderBy('total', 'desc')
             ->limit(10)
             ->get();
 
         // Daily complaints trend
-        $dailyTrend = Complaint::select(
+        $dailyTrend = (clone $complaintQuery)
+            ->select(
                 DB::raw('DATE(created_at) as date'),
                 DB::raw('count(*) as total')
             )
-            ->whereBetween('created_at', [$dateFrom, $dateTo])
             ->groupBy('date')
             ->orderBy('date', 'asc')
             ->get();
@@ -60,31 +69,46 @@ class ReportController extends Controller
         $adminPerformance = User::where('role', 'admin')
             ->withCount([
                 'assignedComplaints as total_assigned' => function($q) use ($dateFrom, $dateTo) {
-                    $q->whereBetween('created_at', [$dateFrom, $dateTo]);
+                    if ($dateFrom) {
+                        $q->where('created_at', '>=', $dateFrom . ' 00:00:00');
+                    }
+                    if ($dateTo) {
+                        $q->where('created_at', '<=', $dateTo . ' 23:59:59');
+                    }
                 },
                 'assignedComplaints as total_resolved' => function($q) use ($dateFrom, $dateTo) {
-                    $q->where('status', 'resolved')
-                      ->whereBetween('created_at', [$dateFrom, $dateTo]);
+                    $q->where('status', 'resolved');
+                    if ($dateFrom) {
+                        $q->where('created_at', '>=', $dateFrom . ' 00:00:00');
+                    }
+                    if ($dateTo) {
+                        $q->where('created_at', '<=', $dateTo . ' 23:59:59');
+                    }
                 }
             ])
             ->get();
 
         // Average resolution time
-        $avgResolutionTime = Complaint::whereNotNull('resolved_at')
-            ->whereBetween('created_at', [$dateFrom, $dateTo])
+        $avgResolutionTime = (clone $complaintQuery)
+            ->whereNotNull('resolved_at')
             ->selectRaw('AVG(DATEDIFF(resolved_at, created_at)) as avg_days')
             ->value('avg_days');
 
         // Active users
         $activeUsers = User::where('role', 'user')
             ->whereHas('complaints', function($q) use ($dateFrom, $dateTo) {
-                $q->whereBetween('created_at', [$dateFrom, $dateTo]);
+                if ($dateFrom) {
+                    $q->where('created_at', '>=', $dateFrom . ' 00:00:00');
+                }
+                if ($dateTo) {
+                    $q->where('created_at', '<=', $dateTo . ' 23:59:59');
+                }
             })
             ->count();
 
         // Resolution rate
-        $resolvedCount = Complaint::where('status', 'resolved')
-            ->whereBetween('created_at', [$dateFrom, $dateTo])
+        $resolvedCount = (clone $complaintQuery)
+            ->where('status', 'resolved')
             ->count();
         $resolutionRate = $totalComplaints > 0 ? round(($resolvedCount / $totalComplaints) * 100, 2) : 0;
 
@@ -106,14 +130,19 @@ class ReportController extends Controller
 
     public function export(Request $request)
     {
-        $dateFrom = $request->input('date_from', now()->startOfMonth()->format('Y-m-d'));
-        $dateTo = $request->input('date_to', now()->format('Y-m-d'));
+        $dateFrom = $request->input('date_from');
+        $dateTo = $request->input('date_to');
 
-        $complaints = Complaint::with(['user', 'assignedAdmin'])
-            ->whereBetween('created_at', [$dateFrom, $dateTo])
-            ->get();
+        $query = Complaint::with(['user', 'assignedAdmin']);
+        if ($dateFrom) {
+            $query->where('created_at', '>=', $dateFrom . ' 00:00:00');
+        }
+        if ($dateTo) {
+            $query->where('created_at', '<=', $dateTo . ' 23:59:59');
+        }
+        $complaints = $query->get();
 
-        $filename = 'laporan_keluhan_' . $dateFrom . '_to_' . $dateTo . '.csv';
+        $filename = 'laporan_keluhan_' . ($dateFrom ?: 'all') . '_to_' . ($dateTo ?: 'all') . '.csv';
 
         $headers = [
             'Content-Type' => 'text/csv',

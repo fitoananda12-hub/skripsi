@@ -28,7 +28,16 @@ class ProfileController extends Controller
             'phone' => ['required', 'string', 'max:20'],
             'address' => ['required', 'string'],
             'current_password' => ['nullable', 'required_with:new_password'],
-            'new_password' => ['nullable', 'confirmed', Password::min(8)],
+            'new_password' => [
+                'nullable', 
+                'confirmed', 
+                Password::min(8)
+                    ->letters()
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols()
+                    ->uncompromised()
+            ],
         ], [
             'name.required' => 'Nama harus diisi',
             'email.required' => 'Email harus diisi',
@@ -42,6 +51,11 @@ class ProfileController extends Controller
             'current_password.required_with' => 'Password lama harus diisi jika ingin mengganti password',
             'new_password.confirmed' => 'Konfirmasi password baru tidak cocok',
             'new_password.min' => 'Password baru minimal 8 karakter',
+            'new_password.letters' => 'Password baru harus mengandung minimal satu huruf',
+            'new_password.mixed' => 'Password baru harus mengandung kombinasi huruf besar dan kecil',
+            'new_password.numbers' => 'Password baru harus mengandung minimal satu angka',
+            'new_password.symbols' => 'Password baru harus mengandung minimal satu simbol',
+            'new_password.uncompromised' => 'Password baru ini terdeteksi pernah bocor di internet, silakan gunakan password lain demi keamanan',
         ]);
 
         // Update basic info

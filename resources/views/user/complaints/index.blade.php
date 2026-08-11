@@ -17,11 +17,12 @@
     </div>
 
     <!-- Statistics -->
-    <div class="grid md:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
         @php
             $total = auth()->user()->complaints()->count();
             $submitted = auth()->user()->complaints()->where('status', 'submitted')->count();
             $inProgress = auth()->user()->complaints()->where('status', 'in_progress')->count();
+            $returned = auth()->user()->complaints()->where('status', 'returned')->count();
             $resolved = auth()->user()->complaints()->where('status', 'resolved')->count();
         @endphp
 
@@ -36,6 +37,10 @@
         <div class="bg-white rounded-lg p-4 shadow-md border-l-4 border-blue-600">
             <p class="text-gray-600 text-sm">Diproses</p>
             <h3 class="text-2xl font-bold text-blue-600">{{ $inProgress }}</h3>
+        </div>
+        <div class="bg-white rounded-lg p-4 shadow-md border-l-4 border-red-500">
+            <p class="text-gray-600 text-sm">Return</p>
+            <h3 class="text-2xl font-bold text-red-600">{{ $returned }}</h3>
         </div>
         <div class="bg-white rounded-lg p-4 shadow-md border-l-4 border-green-500">
             <p class="text-gray-600 text-sm">Selesai</p>
@@ -55,6 +60,7 @@
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Masalah</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Prioritas</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Customer</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Tanggal</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Aksi</th>
                     </tr>
@@ -80,6 +86,13 @@
                             <span class="px-3 py-1 text-xs font-semibold rounded-full {{ $complaint->getPriorityBadgeClass() }}">
                                 {{ $complaint->getPriorityLabel() }}
                             </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            @if($complaint->customer_name)
+                                <p class="text-sm text-gray-700 font-medium">{{ $complaint->customer_name }}</p>
+                            @else
+                                <p class="text-sm text-gray-400 italic">Belum ada</p>
+                            @endif
                         </td>
                         <td class="px-6 py-4">
                             <p class="text-sm text-gray-600">{{ $complaint->created_at->format('d M Y') }}</p>

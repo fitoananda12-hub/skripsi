@@ -41,8 +41,8 @@ class HistoryController extends Controller
             'all' => Complaint::where('user_id', auth()->id())->count(),
             'submitted' => Complaint::where('user_id', auth()->id())->where('status', 'submitted')->count(),
             'in_progress' => Complaint::where('user_id', auth()->id())->where('status', 'in_progress')->count(),
+            'returned' => Complaint::where('user_id', auth()->id())->where('status', 'returned')->count(),
             'resolved' => Complaint::where('user_id', auth()->id())->where('status', 'resolved')->count(),
-            'closed' => Complaint::where('user_id', auth()->id())->where('status', 'closed')->count(),
         ];
 
         return view('user.history', compact('complaints', 'statusCounts'));

@@ -21,8 +21,8 @@
                 <div class="flex items-center mb-8">
                     <i class="fas fa-user-shield text-3xl mr-3"></i>
                     <div>
-                        <h1 class="text-xl font-bold">Admin Panel</h1>
-                        <p class="text-xs text-indigo-200">CS Management</p>
+                        <h1 class="text-xl font-bold">Admin Laboratorium</h1>
+                        <p class="text-xs text-indigo-200">Management System</p>
                     </div>
                 </div>
 
@@ -39,9 +39,15 @@
                         <i class="fas fa-lightbulb w-5"></i>
                         <span class="ml-3">Solusi</span>
                     </a>
+                    @php $pendingCount = \App\Models\User::where('role','user')->where('registration_status','pending')->count(); @endphp
                     <a href="{{ route('admin.users.index') }}" class="flex items-center px-4 py-3 rounded-lg {{ request()->routeIs('admin.users.*') ? 'bg-white text-indigo-600' : 'hover:bg-indigo-700' }} transition">
                         <i class="fas fa-users w-5"></i>
                         <span class="ml-3">User</span>
+                        @if($pendingCount > 0)
+                        <span class="ml-auto bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-0.5 rounded-full animate-pulse">
+                            {{ $pendingCount }}
+                        </span>
+                        @endif
                     </a>
                     <a href="{{ route('admin.reports.index') }}" class="flex items-center px-4 py-3 rounded-lg {{ request()->routeIs('admin.reports.*') ? 'bg-white text-indigo-600' : 'hover:bg-indigo-700' }} transition">
                         <i class="fas fa-chart-bar w-5"></i>
@@ -58,18 +64,12 @@
                 <div class="flex items-center justify-between px-6 py-4">
                     <h2 class="text-2xl font-bold text-gray-800">@yield('page-title', 'Dashboard')</h2>
                     
-                    <div class="flex items-center space-x-4">
-                        <div class="text-right">
-                            <p class="text-sm font-semibold text-gray-800">{{ auth()->user()->name }}</p>
-                            <p class="text-xs text-gray-500">Administrator</p>
-                        </div>
-                        <form method="POST" action="{{ route('logout') }}" class="inline">
-                            @csrf
-                            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition">
-                                <i class="fas fa-sign-out-alt mr-2"></i>Logout
-                            </button>
-                        </form>
-                    </div>
+                    <form method="POST" action="{{ route('logout') }}" class="inline">
+                        @csrf
+                        <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition">
+                            <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                        </button>
+                    </form>
                 </div>
             </header>
 

@@ -37,36 +37,51 @@ class ComplaintController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'product_name' => ['required', 'string', 'max:255'],
-            'problem_type' => ['required', 'string'],
-            'description' => ['required', 'string'],
-            'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
-            'incident_date' => ['required', 'date', 'before_or_equal:today'],
+            'customer_name'      => ['required', 'string', 'max:255'],
+            'product_name'       => ['required', 'string', 'max:255'],
+            'problem_type'       => ['required', 'string'],
+            'problem_type_custom'=> ['nullable', 'string', 'max:100', 'required_if:problem_type,Lainnya'],
+            'description'        => ['required', 'string'],
+            'media'              => ['nullable', 'array'],
+            'media.*'            => ['file', 'mimes:jpeg,png,jpg,mp4,mov', 'max:10240'],
+            'incident_date'      => ['required', 'date', 'before_or_equal:today'],
         ], [
-            'product_name.required' => 'Nama produk harus diisi',
-            'problem_type.required' => 'Jenis masalah harus dipilih',
-            'description.required' => 'Deskripsi keluhan harus diisi',
-            'photo.image' => 'File harus berupa gambar',
-            'photo.mimes' => 'Format gambar harus jpeg, png, atau jpg',
-            'photo.max' => 'Ukuran gambar maksimal 2MB',
-            'incident_date.required' => 'Tanggal kejadian harus diisi',
-            'incident_date.before_or_equal' => 'Tanggal kejadian tidak boleh melebihi hari ini',
+            'customer_name.required'       => 'Nama customer harus diisi',
+            'product_name.required'        => 'Nama produk harus diisi',
+            'problem_type.required'        => 'Jenis masalah harus dipilih',
+            'problem_type_custom.required_if' => 'Silakan ketik jenis masalah Anda secara spesifik',
+            'problem_type_custom.max'      => 'Jenis masalah maksimal 100 karakter',
+            'description.required'         => 'Deskripsi keluhan harus diisi',
+            'media.array'                  => 'File bukti harus berupa array',
+            'media.*.file'                 => 'File bukti harus berupa file valid',
+            'media.*.mimes'                => 'Format file harus berupa foto (jpeg, png, jpg) atau video (mp4, mov)',
+            'media.*.max'                  => 'Ukuran file bukti maksimal 10MB',
+            'incident_date.required'       => 'Tanggal kejadian harus diisi',
+            'incident_date.before_or_equal'=> 'Tanggal kejadian tidak boleh melebihi hari ini',
         ]);
 
-        $photoPath = null;
-        if ($request->hasFile('photo')) {
-            $photoPath = $request->file('photo')->store('complaints', 'public');
+        // Jika pilih "Lainnya", gunakan teks custom sebagai nilai problem_type
+        $finalProblemType = ($validated['problem_type'] === 'Lainnya' && !empty($validated['problem_type_custom']))
+            ? trim($validated['problem_type_custom'])
+            : $validated['problem_type'];
+
+        $photoPaths = [];
+        if ($request->hasFile('media')) {
+            foreach ($request->file('media') as $file) {
+                $photoPaths[] = $file->store('complaints', 'public');
+            }
         }
 
         $complaint = Complaint::create([
-            'user_id' => auth()->id(),
-            'product_name' => $validated['product_name'],
-            'problem_type' => $validated['problem_type'],
-            'description' => $validated['description'],
-            'photo' => $photoPath,
+            'user_id'       => auth()->id(),
+            'customer_name' => $validated['customer_name'],
+            'product_name'  => $validated['product_name'],
+            'problem_type'  => $finalProblemType,
+            'description'   => $validated['description'],
+            'photo'         => $photoPaths,
             'incident_date' => $validated['incident_date'],
-            'status' => 'submitted',
-            'priority' => 'medium',
+            'status'        => 'submitted',
+            'priority'      => 'medium',
         ]);
 
         return redirect()->route('user.complaints.show', $complaint)

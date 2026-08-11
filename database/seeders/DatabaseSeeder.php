@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
     {
         // Create Admin User
         $admin = User::create([
-            'name' => 'Admin CS',
+            'name' => 'Admin Laboratorium',
             'email' => 'admin@esabumindo.com',
             'nik' => 'ADM001',
             'jabatan' => 'Administrator',

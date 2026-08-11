@@ -61,6 +61,14 @@
                     </label>
                 </div>
 
+                <!-- Cloudflare Turnstile -->
+                <div class="mb-4">
+                    <div class="cf-turnstile" data-sitekey="{{ config('services.turnstile.site_key') }}" data-theme="light"></div>
+                    @error('cf-turnstile-response')
+                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <!-- Submit Button -->
                 <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transition shadow-lg">
                     <i class="fas fa-sign-in-alt mr-2"></i>Login
@@ -83,14 +91,9 @@
                     </a>
                 </div>
             </form>
-
-            <!-- Demo Credentials -->
-            <div class="mt-6 p-4 bg-blue-50 rounded-lg">
-                <p class="text-xs text-blue-800 font-medium mb-2">Demo Credentials:</p>
-                <p class="text-xs text-blue-700">Admin: admin@esabumindo.com / admin123</p>
-                <p class="text-xs text-blue-700">User: budi@example.com / password123</p>
-            </div>
         </div>
     </div>
 </div>
+
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 @endsection

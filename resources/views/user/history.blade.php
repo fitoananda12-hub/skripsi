@@ -6,7 +6,7 @@
 @section('content')
 <div class="space-y-6">
     <!-- Statistics Cards -->
-    <div class="grid md:grid-cols-5 gap-4">
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
         <div class="bg-white rounded-lg p-4 shadow-md {{ !request('status') ? 'ring-2 ring-purple-500' : '' }}">
             <a href="{{ route('user.history') }}" class="block">
                 <p class="text-gray-600 text-sm">Semua</p>
@@ -25,16 +25,16 @@
                 <h3 class="text-2xl font-bold text-blue-600">{{ $statusCounts['in_progress'] }}</h3>
             </a>
         </div>
+        <div class="bg-white rounded-lg p-4 shadow-md {{ request('status') == 'returned' ? 'ring-2 ring-red-500' : '' }}">
+            <a href="{{ route('user.history', ['status' => 'returned']) }}" class="block">
+                <p class="text-gray-600 text-sm">Return</p>
+                <h3 class="text-2xl font-bold text-red-600">{{ $statusCounts['returned'] }}</h3>
+            </a>
+        </div>
         <div class="bg-white rounded-lg p-4 shadow-md {{ request('status') == 'resolved' ? 'ring-2 ring-green-500' : '' }}">
             <a href="{{ route('user.history', ['status' => 'resolved']) }}" class="block">
                 <p class="text-gray-600 text-sm">Selesai</p>
                 <h3 class="text-2xl font-bold text-green-600">{{ $statusCounts['resolved'] }}</h3>
-            </a>
-        </div>
-        <div class="bg-white rounded-lg p-4 shadow-md {{ request('status') == 'closed' ? 'ring-2 ring-gray-500' : '' }}">
-            <a href="{{ route('user.history', ['status' => 'closed']) }}" class="block">
-                <p class="text-gray-600 text-sm">Ditutup</p>
-                <h3 class="text-2xl font-bold text-gray-600">{{ $statusCounts['closed'] }}</h3>
             </a>
         </div>
     </div>
@@ -87,6 +87,7 @@
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Produk</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Masalah</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Customer</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Tanggal</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Diselesaikan</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Aksi</th>
@@ -108,6 +109,13 @@
                             <span class="px-3 py-1 text-xs font-semibold rounded-full {{ $complaint->getStatusBadgeClass() }}">
                                 {{ $complaint->getStatusLabel() }}
                             </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            @if($complaint->customer_name)
+                                <p class="text-sm text-gray-700">{{ $complaint->customer_name }}</p>
+                            @else
+                                <p class="text-sm text-gray-400 italic">Belum ada</p>
+                            @endif
                         </td>
                         <td class="px-6 py-4">
                             <p class="text-sm text-gray-600">{{ $complaint->created_at->format('d M Y') }}</p>

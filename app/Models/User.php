@@ -21,6 +21,10 @@ class User extends Authenticatable
         'password',
         'role',
         'is_active',
+        'registration_status',
+        'rejection_reason',
+        'approved_at',
+        'approved_by',
     ];
 
     protected $hidden = [
@@ -32,8 +36,9 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'is_active' => 'boolean',
+            'approved_at'       => 'datetime',
+            'password'          => 'hashed',
+            'is_active'         => 'boolean',
         ];
     }
 
@@ -53,7 +58,12 @@ class User extends Authenticatable
         return $this->hasMany(Solution::class, 'created_by');
     }
 
-    // Helper methods
+    public function approvedBy()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    // Helper methods - Role
     public function isAdmin()
     {
         return $this->role === 'admin';
@@ -62,5 +72,21 @@ class User extends Authenticatable
     public function isUser()
     {
         return $this->role === 'user';
+    }
+
+    // Helper methods - Registration Status
+    public function isPending()
+    {
+        return $this->registration_status === 'pending';
+    }
+
+    public function isApproved()
+    {
+        return $this->registration_status === 'approved';
+    }
+
+    public function isRejected()
+    {
+        return $this->registration_status === 'rejected';
     }
 }

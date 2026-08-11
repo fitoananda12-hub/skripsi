@@ -11,6 +11,7 @@ class Complaint extends Model
 
     protected $fillable = [
         'user_id',
+        'customer_name',
         'complaint_number',
         'product_name',
         'problem_type',
@@ -22,11 +23,14 @@ class Complaint extends Model
         'assigned_to',
         'admin_response',
         'resolved_at',
+        'returned_at',
     ];
 
     protected $casts = [
         'incident_date' => 'date',
         'resolved_at' => 'datetime',
+        'returned_at' => 'datetime',
+        'photo' => 'array',
     ];
 
     // Relasi
@@ -52,6 +56,7 @@ class Complaint extends Model
         return match($this->status) {
             'submitted' => 'bg-yellow-100 text-yellow-800',
             'in_progress' => 'bg-blue-100 text-blue-800',
+            'returned' => 'bg-red-100 text-red-800',
             'resolved' => 'bg-green-100 text-green-800',
             'closed' => 'bg-gray-100 text-gray-800',
             default => 'bg-gray-100 text-gray-800',
@@ -73,6 +78,7 @@ class Complaint extends Model
         return match($this->status) {
             'submitted' => 'Diajukan',
             'in_progress' => 'Diproses',
+            'returned' => 'Return',
             'resolved' => 'Selesai',
             'closed' => 'Ditutup',
             default => 'Unknown',

@@ -33,6 +33,12 @@
                 </div>
 
                 <div class="space-y-4">
+                    <!-- Customer Name -->
+                    <div>
+                        <label class="text-sm font-semibold text-gray-600">Nama Customer</label>
+                        <p class="text-gray-800 font-medium">{{ $complaint->customer_name ?? '-' }}</p>
+                    </div>
+
                     <!-- Product Name -->
                     <div>
                         <label class="text-sm font-semibold text-gray-600">Nama Produk</label>
@@ -57,11 +63,63 @@
                         <p class="text-gray-800">{{ $complaint->incident_date->format('d M Y') }}</p>
                     </div>
 
-                    <!-- Photo -->
-                    @if($complaint->photo)
+                    <!-- Bukti Keluhan (Multiple Photos / Videos) -->
+                    @php
+                        $photos = [];
+                        if ($complaint->photo) {
+                            if (is_array($complaint->photo)) {
+                                $photos = $complaint->photo;
+                            } else {
+                                $decoded = json_decode($complaint->photo, true);
+                                if (is_array($decoded)) {
+                                    $photos = $decoded;
+                                } else {
+                                    $photos = [$complaint->photo];
+                                }
+                            }
+                        }
+                    @endphp
+
+                    @if(count($photos) > 0)
                     <div>
-                        <label class="text-sm font-semibold text-gray-600 block mb-2">Foto Produk</label>
-                        <img src="{{ asset('storage/' . $complaint->photo) }}" alt="Photo" class="rounded-lg max-h-96 object-cover">
+                        <label class="text-sm font-semibold text-gray-600 block mb-3">
+                            Bukti Keluhan ({{ count($photos) }} file)
+                        </label>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                            @foreach($photos as $path)
+                                @php
+                                    $is_video = in_array(strtolower(pathinfo($path, PATHINFO_EXTENSION)), ['mp4', 'mov', 'avi', 'mkv', 'webm']);
+                                    $file_url = asset('storage/' . $path);
+                                @endphp
+                                <div class="relative rounded-xl overflow-hidden border border-gray-200 aspect-video shadow-md bg-black cursor-pointer group hover:scale-[1.03] hover:shadow-lg transition-all duration-300"
+                                     onclick="openLightbox('{{ $file_url }}', {{ $is_video ? 'true' : 'false' }})">
+                                    
+                                    @if($is_video)
+                                        <video src="{{ $file_url }}" class="w-full h-full object-cover opacity-80 pointer-events-none"></video>
+                                        <div class="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-colors">
+                                            <span class="w-10 h-10 flex items-center justify-center rounded-full bg-white/90 text-purple-600 shadow-md transform group-hover:scale-115 transition-all duration-300">
+                                                <i class="fas fa-play text-xs ml-0.5"></i>
+                                            </span>
+                                        </div>
+                                    @else
+                                        <img src="{{ $file_url }}" alt="Bukti" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                                    @endif
+                                    
+                                    <div class="absolute bottom-2 left-2 bg-black/60 backdrop-blur-sm text-[10px] text-white font-medium px-2 py-0.5 rounded shadow">
+                                        @if($is_video)
+                                            <i class="fas fa-video mr-1"></i> Video
+                                        @else
+                                            <i class="fas fa-image mr-1"></i> Foto
+                                        @endif
+                                    </div>
+                                    
+                                    <!-- Hover Overlay with Zoom Icon -->
+                                    <div class="absolute inset-0 bg-purple-950/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300 pointer-events-none">
+                                        <i class="fas fa-search-plus text-white text-2xl drop-shadow-md transform scale-75 group-hover:scale-100 transition-transform duration-300"></i>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
                     @endif
                 </div>
@@ -130,7 +188,7 @@
                 <h3 class="font-bold text-gray-800 mb-4">Status Timeline</h3>
                 <div class="space-y-4">
                     <div class="flex items-start">
-                        <div class="flex-shrink-0 w-8 h-8 rounded-full {{ $complaint->status == 'submitted' || $complaint->status == 'in_progress' || $complaint->status == 'resolved' ? 'bg-green-500' : 'bg-gray-300' }} flex items-center justify-center">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
                             <i class="fas fa-check text-white text-xs"></i>
                         </div>
                         <div class="ml-3">
@@ -140,13 +198,13 @@
                     </div>
 
                     <div class="flex items-start">
-                        <div class="flex-shrink-0 w-8 h-8 rounded-full {{ $complaint->status == 'in_progress' || $complaint->status == 'resolved' ? 'bg-green-500' : 'bg-gray-300' }} flex items-center justify-center">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-full {{ $complaint->status == 'in_progress' || $complaint->status == 'resolved' || $complaint->status == 'returned' ? 'bg-green-500' : 'bg-gray-300' }} flex items-center justify-center">
                             <i class="fas fa-check text-white text-xs"></i>
                         </div>
                         <div class="ml-3">
                             <p class="font-semibold text-gray-800">Diproses</p>
                             <p class="text-xs text-gray-500">
-                                @if($complaint->status == 'in_progress' || $complaint->status == 'resolved')
+                                @if($complaint->status == 'in_progress' || $complaint->status == 'resolved' || $complaint->status == 'returned')
                                     Sedang ditangani
                                 @else
                                     Menunggu
@@ -156,7 +214,7 @@
                     </div>
 
                     <div class="flex items-start">
-                        <div class="flex-shrink-0 w-8 h-8 rounded-full {{ $complaint->status == 'resolved' ? 'bg-green-500' : 'bg-gray-300' }} flex items-center justify-center">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-full {{ $complaint->status == 'resolved' || $complaint->status == 'returned' ? 'bg-green-500' : 'bg-gray-300' }} flex items-center justify-center">
                             <i class="fas fa-check text-white text-xs"></i>
                         </div>
                         <div class="ml-3">
@@ -170,6 +228,24 @@
                             </p>
                         </div>
                     </div>
+
+                    @if($complaint->returned_at || $complaint->status == 'returned')
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-full bg-red-500 flex items-center justify-center">
+                            <i class="fas fa-undo text-white text-xs"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="font-semibold text-gray-800 text-red-600">Return</p>
+                            <p class="text-xs text-gray-500">
+                                @if($complaint->returned_at)
+                                    {{ $complaint->returned_at->format('d M Y H:i') }}
+                                @else
+                                    {{ $complaint->updated_at->format('d M Y H:i') }}
+                                @endif
+                            </p>
+                        </div>
+                    </div>
+                    @endif
                 </div>
             </div>
 
@@ -199,4 +275,6 @@
         </div>
     </div>
 </div>
+
+@include('partials.lightbox')
 @endsection

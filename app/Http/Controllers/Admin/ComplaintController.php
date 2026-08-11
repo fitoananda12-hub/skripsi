@@ -34,6 +34,7 @@ class ComplaintController extends Controller
             $query->where(function($q) use ($request) {
                 $q->where('complaint_number', 'like', '%' . $request->search . '%')
                   ->orWhere('product_name', 'like', '%' . $request->search . '%')
+                  ->orWhere('customer_name', 'like', '%' . $request->search . '%')
                   ->orWhereHas('user', function($q) use ($request) {
                       $q->where('name', 'like', '%' . $request->search . '%');
                   });
@@ -48,8 +49,8 @@ class ComplaintController extends Controller
             'all' => Complaint::count(),
             'submitted' => Complaint::where('status', 'submitted')->count(),
             'in_progress' => Complaint::where('status', 'in_progress')->count(),
+            'returned' => Complaint::where('status', 'returned')->count(),
             'resolved' => Complaint::where('status', 'resolved')->count(),
-            'closed' => Complaint::where('status', 'closed')->count(),
         ];
 
         return view('admin.complaints.index', compact('complaints', 'admins', 'statusCounts'));
@@ -58,15 +59,16 @@ class ComplaintController extends Controller
     public function show(Complaint $complaint)
     {
         $complaint->load(['user', 'assignedAdmin', 'solutions']);
-        $admins = User::where('role', 'admin')->get();
-        $solutions = Solution::where('is_active', true)->get();
 
-        return view('admin.complaints.show', compact('complaint', 'admins', 'solutions'));
+        return view('admin.complaints.show', compact('complaint'));
     }
 
     public function edit(Complaint $complaint)
     {
-        $admins = User::where('role', 'admin')->get();
+        $complaint->load('solutions');
+        $admins = User::whereIn('role', ['admin', 'admin-lab', 'admin-sales'])
+              ->where('name', '!=', 'Super Admin')
+              ->get();
         $solutions = Solution::where('is_active', true)->get();
 
         return view('admin.complaints.edit', compact('complaint', 'admins', 'solutions'));
@@ -75,21 +77,37 @@ class ComplaintController extends Controller
     public function update(Request $request, Complaint $complaint)
     {
         $validated = $request->validate([
-            'status' => ['required', 'in:submitted,in_progress,resolved,closed'],
+            'status' => ['required', 'in:submitted,in_progress,returned,resolved'],
             'priority' => ['required', 'in:low,medium,high'],
             'assigned_to' => ['nullable', 'exists:users,id'],
             'admin_response' => ['nullable', 'string'],
+            'solution_ids' => ['nullable', 'array'],
+            'solution_ids.*' => ['exists:solutions,id'],
         ], [
             'status.required' => 'Status harus dipilih',
             'priority.required' => 'Prioritas harus dipilih',
         ]);
 
-        // If status changed to resolved, set resolved_at
-        if ($validated['status'] === 'resolved' && $complaint->status !== 'resolved') {
-            $validated['resolved_at'] = now();
+        // If status changed, update timestamps accordingly
+        if ($validated['status'] === 'resolved') {
+            $validated['resolved_at'] = $complaint->resolved_at ?? now();
+            $validated['returned_at'] = null;
+        } elseif ($validated['status'] === 'returned') {
+            $validated['returned_at'] = $complaint->returned_at ?? now();
+            $validated['resolved_at'] = $complaint->resolved_at ?? now();
+        } else {
+            $validated['resolved_at'] = null;
+            $validated['returned_at'] = null;
         }
 
+        // Remove solution_ids from validated data before update
+        $solutionIds = $validated['solution_ids'] ?? [];
+        unset($validated['solution_ids']);
+
         $complaint->update($validated);
+
+        // Sync solutions from Knowledge Base
+        $complaint->solutions()->sync($solutionIds);
 
         return redirect()->route('admin.complaints.show', $complaint)
             ->with('success', 'Data keluhan berhasil diperbarui');
@@ -115,7 +133,7 @@ class ComplaintController extends Controller
     {
         $validated = $request->validate([
             'admin_response' => ['required', 'string'],
-            'status' => ['required', 'in:in_progress,resolved'],
+            'status' => ['required', 'in:in_progress,returned,resolved'],
             'solution_ids' => ['nullable', 'array'],
             'solution_ids.*' => ['exists:solutions,id'],
         ], [
@@ -123,11 +141,23 @@ class ComplaintController extends Controller
             'status.required' => 'Status harus dipilih',
         ]);
 
-        $complaint->update([
+        $updateData = [
             'admin_response' => $validated['admin_response'],
             'status' => $validated['status'],
-            'resolved_at' => $validated['status'] === 'resolved' ? now() : null,
-        ]);
+        ];
+
+        if ($validated['status'] === 'resolved') {
+            $updateData['resolved_at'] = $complaint->resolved_at ?? now();
+            $updateData['returned_at'] = null;
+        } elseif ($validated['status'] === 'returned') {
+            $updateData['returned_at'] = $complaint->returned_at ?? now();
+            $updateData['resolved_at'] = $complaint->resolved_at ?? now();
+        } else {
+            $updateData['resolved_at'] = null;
+            $updateData['returned_at'] = null;
+        }
+
+        $complaint->update($updateData);
 
         // Attach solutions if provided
         if (!empty($validated['solution_ids'])) {

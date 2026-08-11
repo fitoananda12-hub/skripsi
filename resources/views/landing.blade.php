@@ -70,10 +70,10 @@
                     </div>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <a href="{{ route('login') }}" class="text-gray-700 hover:text-purple-600 px-4 py-2 rounded-lg font-medium transition">
+                    <a href="/login" onclick="console.log('Login clicked'); return true;" class="text-gray-700 hover:text-purple-600 px-4 py-2 rounded-lg font-medium transition">
                         <i class="fas fa-sign-in-alt mr-2"></i>Masuk
                     </a>
-                    <a href="{{ route('register') }}" class="gradient-bg text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition shadow-md">
+                    <a href="/register" onclick="console.log('Register clicked'); return true;" class="gradient-bg text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition shadow-md">
                         <i class="fas fa-user-plus mr-2"></i>Daftar
                     </a>
                 </div>
@@ -395,14 +395,31 @@
     </footer>
 
     <script>
-        // Smooth scroll
+        // Debug: Check if navbar links exist and are clickable
+        console.log('Landing page loaded');
+        console.log('Navbar links found:', document.querySelectorAll('a[href="/login"], a[href="/register"]').length);
+        
+        // Make sure smooth scroll only affects hash links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                const href = this.getAttribute('href');
+                // Pastikan ini adalah internal link, bukan eksternal
+                if (href && href !== '#' && href.startsWith('#')) {
+                    e.preventDefault();
+                    console.log('Smooth scrolling to:', href);
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
                 }
+            });
+        });
+        
+        // Ensure navbar links work properly
+        document.querySelectorAll('a[href="/login"], a[href="/register"]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                console.log('Navigation link clicked:', this.href);
+                // Allow normal navigation
             });
         });
     </script>

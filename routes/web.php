@@ -5,6 +5,7 @@ use App\Http\Controllers\LandingController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\User\ComplaintController as UserComplaintController;
+use App\Http\Controllers\User\DashboardController as UserDashboardController;
 use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\User\HistoryController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
@@ -13,24 +14,30 @@ use App\Http\Controllers\Admin\SolutionController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\ReportController;
 
+// Test route
+Route::get('/test-login', function() {
+    return view('test-login');
+})->name('test-login');
+
 // Landing Page
 Route::get('/', [LandingController::class, 'index'])->name('landing');
 
-// Authentication Routes
+// Authentication Routes - GET login/register accessible to everyone (including authenticated users)
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::get('/register/pending', [RegisterController::class, 'showPendingPage'])->name('register.pending');
+
+// POST login/register protected by guest and throttle middleware
 Route::middleware('guest')->group(function () {
-    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [LoginController::class, 'login']);
-    Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-    Route::post('/register', [RegisterController::class, 'register']);
+    Route::post('/login', [LoginController::class, 'login'])->middleware('throttle:login');
+    Route::post('/register', [RegisterController::class, 'register'])->middleware('throttle:register');
 });
 
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
 
 // User Routes
 Route::middleware(['auth', 'user'])->prefix('user')->name('user.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('user.dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
     
     // Complaints
     Route::get('/complaints', [UserComplaintController::class, 'index'])->name('complaints.index');
@@ -61,9 +68,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Solutions Knowledge Base
     Route::resource('solutions', SolutionController::class);
     
-    // User Management
+    // User Management - dengan fitur verifikasi registrasi
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+    Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
+    Route::put('/users/{user}/approve', [AdminUserController::class, 'approve'])->name('users.approve');
+    Route::put('/users/{user}/reject', [AdminUserController::class, 'reject'])->name('users.reject');
     Route::put('/users/{user}/toggle-status', [AdminUserController::class, 'toggleStatus'])->name('users.toggle-status');
+    Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
     
     // Reports
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');

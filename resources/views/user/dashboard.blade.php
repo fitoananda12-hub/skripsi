@@ -13,12 +13,6 @@
 
     <!-- Statistics -->
     <div class="grid md:grid-cols-4 gap-6">
-        @php
-            $totalComplaints = auth()->user()->complaints()->count();
-            $submittedComplaints = auth()->user()->complaints()->where('status', 'submitted')->count();
-            $inProgressComplaints = auth()->user()->complaints()->where('status', 'in_progress')->count();
-            $resolvedComplaints = auth()->user()->complaints()->where('status', 'resolved')->count();
-        @endphp
 
         <div class="bg-white rounded-xl p-6 shadow-md">
             <div class="flex items-center justify-between">
@@ -97,10 +91,6 @@
         <h3 class="text-xl font-bold text-gray-800 mb-4">
             <i class="fas fa-clock text-gray-600 mr-2"></i>Keluhan Terbaru
         </h3>
-
-        @php
-            $recentComplaints = auth()->user()->complaints()->latest()->limit(5)->get();
-        @endphp
 
         @if($recentComplaints->count() > 0)
             <div class="overflow-x-auto">
