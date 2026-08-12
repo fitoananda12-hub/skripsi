@@ -17,12 +17,12 @@
         <div class="md:col-span-2 space-y-6">
             <!-- Complaint Details -->
             <div class="bg-white rounded-xl shadow-md p-6">
-                <div class="flex justify-between items-start mb-6">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6">
                     <div>
-                        <h2 class="text-2xl font-bold text-gray-800">{{ $complaint->complaint_number }}</h2>
+                        <h2 class="text-xl sm:text-2xl font-bold text-gray-800">{{ $complaint->complaint_number }}</h2>
                         <p class="text-gray-500 text-sm">Diajukan pada {{ $complaint->created_at->format('d M Y H:i') }}</p>
                     </div>
-                    <div class="flex gap-2">
+                    <div class="flex flex-wrap gap-2">
                         <span class="px-4 py-2 text-sm font-semibold rounded-full {{ $complaint->getStatusBadgeClass() }}">
                             {{ $complaint->getStatusLabel() }}
                         </span>

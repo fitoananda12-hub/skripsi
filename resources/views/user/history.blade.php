@@ -40,7 +40,7 @@
     </div>
 
     <!-- Filters -->
-    <div class="bg-white rounded-xl shadow-md p-6">
+    <div class="bg-white rounded-xl shadow-md p-4 sm:p-6">
         <form method="GET" action="{{ route('user.history') }}" class="grid md:grid-cols-4 gap-4">
             <!-- Search -->
             <div>

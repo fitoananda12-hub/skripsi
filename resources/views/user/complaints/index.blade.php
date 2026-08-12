@@ -6,12 +6,12 @@
 @section('content')
 <div class="space-y-6">
     <!-- Header Actions -->
-    <div class="flex justify-between items-center">
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
         <div>
-            <h2 class="text-2xl font-bold text-gray-800">Daftar Keluhan</h2>
-            <p class="text-gray-600">Kelola dan pantau status keluhan Anda</p>
+            <h2 class="text-xl sm:text-2xl font-bold text-gray-800">Daftar Keluhan</h2>
+            <p class="text-sm sm:text-base text-gray-600">Kelola dan pantau status keluhan Anda</p>
         </div>
-        <a href="{{ route('user.complaints.create') }}" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition shadow-lg">
+        <a href="{{ route('user.complaints.create') }}" class="inline-flex justify-center items-center bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold transition shadow-lg">
             <i class="fas fa-plus-circle mr-2"></i>Buat Keluhan Baru
         </a>
     </div>

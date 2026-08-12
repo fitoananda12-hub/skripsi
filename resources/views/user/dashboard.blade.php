@@ -6,9 +6,9 @@
 @section('content')
 <div class="space-y-6">
     <!-- Welcome Card -->
-    <div class="bg-gradient-to-r from-purple-600 to-purple-800 rounded-2xl p-8 text-white shadow-xl">
-        <h1 class="text-3xl font-bold mb-2">Selamat Datang, {{ auth()->user()->name }}! 👋</h1>
-        <p class="text-purple-100">Kelola keluhan produk Anda dengan mudah melalui dashboard ini</p>
+    <div class="bg-gradient-to-r from-purple-600 to-purple-800 rounded-2xl p-6 sm:p-8 text-white shadow-xl">
+        <h1 class="text-2xl sm:text-3xl font-bold mb-2 break-words">Selamat Datang, {{ auth()->user()->name }}! 👋</h1>
+        <p class="text-sm sm:text-base text-purple-100">Kelola keluhan produk Anda dengan mudah melalui dashboard ini</p>
     </div>
 
     <!-- Statistics -->

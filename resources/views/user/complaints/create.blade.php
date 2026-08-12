@@ -176,11 +176,11 @@
             </div>
 
             <!-- Buttons -->
-            <div class="flex justify-between items-center">
-                <a href="{{ route('user.complaints.index') }}" class="text-gray-600 hover:text-gray-800 font-medium">
+            <div class="flex flex-col-reverse sm:flex-row sm:justify-between sm:items-center gap-4 mt-8">
+                <a href="{{ route('user.complaints.index') }}" class="text-center text-gray-600 hover:text-gray-800 font-medium py-2">
                     <i class="fas fa-arrow-left mr-2"></i>Kembali
                 </a>
-                <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition shadow-lg">
+                <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition shadow-lg w-full sm:w-auto">
                     <i class="fas fa-paper-plane mr-2"></i>Kirim Keluhan
                 </button>
             </div>

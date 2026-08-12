@@ -13,9 +13,12 @@
     </style>
 </head>
 <body class="bg-gray-50">
-    <div class="flex h-screen overflow-hidden">
+    <div class="flex h-screen overflow-hidden relative">
+        <!-- Mobile sidebar backdrop -->
+        <div id="sidebarBackdrop" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-20 hidden lg:hidden transition-opacity cursor-pointer"></div>
+
         <!-- Sidebar -->
-        <aside class="w-64 bg-gradient-to-b from-purple-600 to-purple-800 text-white flex-shrink-0">
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-30 w-64 bg-gradient-to-b from-purple-600 to-purple-800 text-white transform -translate-x-full lg:relative lg:translate-x-0 transition-transform duration-300 ease-in-out flex-shrink-0">
             <div class="p-6">
                 <div class="flex items-center mb-8">
                     <i class="fas fa-cog text-3xl mr-3"></i>
@@ -49,19 +52,24 @@
         <!-- Main Content -->
         <div class="flex-1 flex flex-col overflow-hidden">
             <!-- Top Bar -->
-            <header class="bg-white shadow-sm z-10">
-                <div class="flex items-center justify-between px-6 py-4">
-                    <h2 class="text-2xl font-bold text-gray-800">@yield('page-title', 'Dashboard')</h2>
+            <header class="bg-white shadow-sm z-10 w-full">
+                <div class="flex items-center justify-between px-4 sm:px-6 py-4">
+                    <div class="flex items-center">
+                        <button id="sidebarToggle" class="text-gray-500 hover:text-gray-700 focus:outline-none lg:hidden mr-4">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                        <h2 class="text-xl sm:text-2xl font-bold text-gray-800 break-words">@yield('page-title', 'Dashboard')</h2>
+                    </div>
                     
-                    <div class="flex items-center space-x-4">
-                        <div class="text-right">
+                    <div class="flex items-center space-x-2 sm:space-x-4">
+                        <div class="text-right hidden sm:block">
                             <p class="text-sm font-semibold text-gray-800">{{ auth()->user()->name }}</p>
                             <p class="text-xs text-gray-500">User</p>
                         </div>
-                        <form method="POST" action="{{ route('logout') }}" class="inline">
+                        <form method="POST" action="{{ route('logout') }}" class="inline ml-2">
                             @csrf
-                            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition">
-                                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg transition whitespace-nowrap">
+                                <i class="fas fa-sign-out-alt mr-1 sm:mr-2"></i><span class="hidden sm:inline">Logout</span>
                             </button>
                         </form>
                     </div>
@@ -69,7 +77,7 @@
             </header>
 
             <!-- Content Area -->
-            <main class="flex-1 overflow-y-auto p-6">
+            <main class="flex-1 overflow-y-auto p-4 sm:p-6">
                 @yield('content')
             </main>
         </div>
@@ -102,6 +110,21 @@
                 flashMessage.style.transition = 'opacity 0.5s';
                 setTimeout(() => flashMessage.remove(), 500);
             }, 3000);
+        }
+
+        // Sidebar Toggle Logic
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('-translate-x-full');
+            sidebarBackdrop.classList.toggle('hidden');
+        }
+
+        if (sidebarToggle && sidebarBackdrop && sidebar) {
+            sidebarToggle.addEventListener('click', toggleSidebar);
+            sidebarBackdrop.addEventListener('click', toggleSidebar);
         }
     </script>
 
