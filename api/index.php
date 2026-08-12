@@ -32,8 +32,12 @@ $_ENV['APP_CONFIG_CACHE'] = $storagePath . '/bootstrap/cache/config.php';
 $_ENV['APP_ROUTES_CACHE'] = $storagePath . '/bootstrap/cache/routes.php';
 $_ENV['APP_EVENTS_CACHE'] = $storagePath . '/bootstrap/cache/events.php';
 
+// Panggil autoloader (PENTING: Harus sebelum require app.php!)
+require __DIR__.'/../vendor/autoload.php';
+
 // Atur aplikasi agar merujuk storage ke /tmp
 $app = require_once __DIR__.'/../bootstrap/app.php';
 $app->useStoragePath($storagePath);
 
-require __DIR__ . '/../public/index.php';
+// Jalankan request (sama seperti public/index.php)
+$app->handleRequest(Illuminate\Http\Request::capture());
