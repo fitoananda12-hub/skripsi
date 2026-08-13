@@ -68,7 +68,7 @@ class ComplaintController extends Controller
         $photoPaths = [];
         if ($request->hasFile('media')) {
             foreach ($request->file('media') as $file) {
-                $photoPaths[] = $file->store('complaints', 'public');
+                $photoPaths[] = $file->store('complaints', config('filesystems.default'));
             }
         }
 

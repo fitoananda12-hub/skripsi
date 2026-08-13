@@ -89,7 +89,7 @@
                             @foreach($photos as $path)
                                 @php
                                     $is_video = in_array(strtolower(pathinfo($path, PATHINFO_EXTENSION)), ['mp4', 'mov', 'avi', 'mkv', 'webm']);
-                                    $file_url = asset('storage/' . $path);
+                                    $file_url = \Illuminate\Support\Facades\Storage::url($path);
                                 @endphp
                                 <div class="relative rounded-xl overflow-hidden border border-gray-200 aspect-video shadow-md bg-black cursor-pointer group hover:scale-[1.03] hover:shadow-lg transition-all duration-300"
                                      onclick="openLightbox('{{ $file_url }}', {{ $is_video ? 'true' : 'false' }})">
