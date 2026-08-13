@@ -16,6 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'user' => \App\Http\Middleware\UserMiddleware::class,
         ]);
 
+        $middleware->redirectUsersTo(fn (\Illuminate\Http\Request $request) =>
+            auth()->user()?->isAdmin() ? route('admin.dashboard') : route('user.dashboard')
+        );
+
         // Mendaftarkan SecurityHeaders secara global untuk semua request
         $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
     })

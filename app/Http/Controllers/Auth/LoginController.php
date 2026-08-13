@@ -88,11 +88,11 @@ class LoginController extends Controller
 
             // Redirect berdasarkan role
             if ($user->isAdmin()) {
-                return redirect()->intended(route('admin.dashboard'))
+                return redirect()->route('admin.dashboard')
                     ->with('success', 'Selamat datang, ' . $user->name);
             }
 
-            return redirect()->intended(route('user.dashboard'))
+            return redirect()->route('user.dashboard')
                 ->with('success', 'Selamat datang, ' . $user->name);
         }
 
